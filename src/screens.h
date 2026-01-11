@@ -454,7 +454,7 @@ class TimerScreen : public Screen {
 
         bool running;
         bool finished;
-        bool invertedDisplay;
+        bool displayOn;
 
         void onEnter() override {
             setUpdateInterval(100);
@@ -494,7 +494,7 @@ class TimerScreen : public Screen {
         void resetTimer() {
             running = false;
             finished = false;
-            invertedDisplay = false;
+            displayOn = true;
             curSetting = 1;  // set minutes
 
             setMinutes = 0;
@@ -506,6 +506,11 @@ class TimerScreen : public Screen {
             endTimestamp = 0;
 
             setSleepDelay(180);  // 3 min
+        }
+
+        void timerSetOff() {
+            // this function will be called once when the timer expires
+            displayOn = true;
         }
 
         void update(int dt) override {
@@ -521,8 +526,9 @@ class TimerScreen : public Screen {
                 minutes = abs(timerTime) / 60;
                 seconds = abs(timerTime) % 60;
                 
-                if (timerTime <= 0) {
+                if (timerTime <= 0 && !finished) {
                     finished = true;
+                    timerSetOff();
                 }
 
                 // trimming minutes and seconds to avoid errors
@@ -541,36 +547,37 @@ class TimerScreen : public Screen {
 
         void render() override {
             display.clearDisplay();
+            if (displayOn) {
+                if (displayDots) {
+                        displayMiddleDot(true); }
 
-            if (displayDots) {
-                    displayMiddleDot(true); }
-                
-            displayText("Timer", segmentsCoords[2][0]-16, segmentsCoords[2][1]);
+                if (running) {
+                    displayClockNums(minutes, segmentsCoords[0][0], segmentsCoords[0][1]);
+                    displayClockNums(seconds, segmentsCoords[1][0], segmentsCoords[1][1]);
 
-            if (running) {
-                displayClockNums(minutes, segmentsCoords[0][0], segmentsCoords[0][1]);
-                displayClockNums(seconds, segmentsCoords[1][0], segmentsCoords[1][1]);
+                    displayText(finished ? "T==================" : "T", segmentsCoords[2][0]-16, segmentsCoords[2][1]);
+                    
+                } else {
+                    displayText("Timer", segmentsCoords[2][0]-16, segmentsCoords[2][1]);
 
-                if (finished) {
-                    displayText("=========", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                    displayClockNums(setMinutes, segmentsCoords[0][0], segmentsCoords[0][1]);
+                    displayClockNums(setSeconds, segmentsCoords[1][0], segmentsCoords[1][1]);
+
+                    switch (curSetting) {
+                    case 1:
+                        displayText("min", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                        break;
+                    case 2:
+                        displayText("sec", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                        break;
+                    
+                    default:
+                        displayText("start", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                        break;
+                    }
                 }
-                
             } else {
-                displayClockNums(setMinutes, segmentsCoords[0][0], segmentsCoords[0][1]);
-                displayClockNums(setSeconds, segmentsCoords[1][0], segmentsCoords[1][1]);
-
-                switch (curSetting) {
-                case 1:
-                    displayText("min", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
-                    break;
-                case 2:
-                    displayText("sec", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
-                    break;
-                
-                default:
-                    displayText("start", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
-                    break;
-                }
+                displayText("T", segmentsCoords[2][0]-16, segmentsCoords[2][1]);
             }
             
             display.display();
@@ -633,6 +640,15 @@ class TimerScreen : public Screen {
         int handleInput(int button) override {
             if (running) {
                 switch (button) {
+                    case 0:
+                        if (!finished) {
+                            displayOn = !displayOn;
+                        } else {
+                            displayOn = true;
+                        }
+                        return -1;
+                        break;
+                    
                     case 2:
                         stopTimer();
                         resetTimer();
