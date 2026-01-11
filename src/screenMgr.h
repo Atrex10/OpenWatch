@@ -1,7 +1,7 @@
 #ifndef SCREENMGR_H
 #define SCREENMGR_H
 
-#define SCREEN_SWITCH_BUTTON 1
+#define SCREEN_SWITCH_CODE -2
 
 #include "Screen.h"
 
@@ -38,12 +38,12 @@ class ScreenManager {
 
         // buttons input handling
         void handleInput(int button) {
-            int targerScreen = screens[current]->handleInput(button);
-            if (targerScreen >= 0 && targerScreen < screensCount) {
-                setScreen(targerScreen);
+            int targetScreen = screens[current]->handleInput(button);
+            if (targetScreen >= 0 && targetScreen < screensCount) {
+                setScreen(targetScreen);
             }
 
-            if (button == SCREEN_SWITCH_BUTTON) {
+            if (targetScreen == SCREEN_SWITCH_CODE) {
                 nextScreen();
             }
         }

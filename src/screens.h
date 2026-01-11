@@ -13,13 +13,12 @@ class DummyScreen : public Screen {
     public:
         DummyScreen() {}
 
-        int counter = 0;
-
         void onEnter() override {
-            setUpdateInterval(100);
-            setRenderInterval(100);
-            counter -= 10;
-            setSleepDelay(20);
+            setUpdateInterval(1000);
+            setRenderInterval(1000);
+            setSleepDelay(10);
+            update(1000);
+            render();
         }
 
         void onExit() override {
@@ -28,13 +27,13 @@ class DummyScreen : public Screen {
         }
 
         void update(int dt) override {
-            counter++;
+            ;
         }
 
         void render() override {
             display.clearDisplay();
-
-            displayText(String(counter), 0, 50);
+            
+            displayText("dummy", 0, 0);
 
             display.display();
         }
@@ -42,7 +41,11 @@ class DummyScreen : public Screen {
         int handleInput(int button) override {
             switch (button) {
             case 0:
-                return 0;
+                return -1;
+                break;
+            
+            case 1:
+                return -2;
                 break;
             
             default: return -1; break; }
@@ -97,6 +100,10 @@ class ClockScreen : public Screen {
             switch (button) {
             case 0:
                 return -1;
+                break;
+            
+            case 1:
+                return -2;
                 break;
             
             case 2:
@@ -156,6 +163,10 @@ class DateScreen : public Screen {
             switch (button) {
             case 0:
                 return 0;
+                break;
+            
+            case 1:
+                return -2;
                 break;
             
             default: return -1; break; }
@@ -314,6 +325,11 @@ class StopwatchScreen : public Screen {
             case 0:
                 return 0;
                 break;
+            
+            case 1:
+                return -2;
+                break;
+            
             case 2:
                 if (running) {
                     rendering = !rendering;
@@ -397,6 +413,10 @@ class TemperatureScreen : public Screen {
                 return 0;
                 break;
             
+            case 1:
+                return -2;
+                break;
+            
             default: return -1; break; }
         }
 };
@@ -435,6 +455,10 @@ class SettingsScreen : public Screen {
             switch (button) {
             case 0:
                 return 0;
+                break;
+              
+            case 1:
+                return -2;
                 break;
             
             default: return -1; break; }
@@ -490,6 +514,10 @@ class WiFiTimeScreen : public Screen {
             switch (button) {
             case 0:
                 return 0;
+                break;
+            
+            case 1:
+                return -2;
                 break;
             
             case 3:
