@@ -1,6 +1,7 @@
 #include "rtcFunc.h"
 
-#include "DS3231.h"
+#include <DS3231.h>
+#include <TimeLib.h>
 #include "mainHeader.h"
 
 bool h12 = false;
@@ -9,18 +10,24 @@ bool CenturyBit = false;
 
 DS3231 rtc;
 
+tmElements_t dateTime;
+
 int timeUpdateInterval = 1000;
 
-timeSct curTime = { rtc.getSecond(), rtc.getMinute(), rtc.getHour(h12, hPM) };
-dateSct curDate = { rtc.getDate(), rtc.getMonth(CenturyBit), rtc.getYear() };
+// timeSct curTime = { rtc.getSecond(), rtc.getMinute(), rtc.getHour(h12, hPM) };
+// dateSct curDate = { rtc.getDate(), rtc.getMonth(CenturyBit), rtc.getYear() };
 
 // time reading functions
 void updateCurTime() {
-    curTime = { rtc.getSecond(), rtc.getMinute(), rtc.getHour(h12, hPM) };
+    dateTime.Second = rtc.getSecond();
+    dateTime.Minute = rtc.getMinute();
+    dateTime.Hour = rtc.getHour(h12, hPM);
 }
 
 void updateCurDate() {
-    curDate = { rtc.getDate(), rtc.getMonth(CenturyBit), rtc.getYear() };
+    dateTime.Day = rtc.getDate();
+    dateTime.Month = rtc.getMonth(CenturyBit);
+    dateTime.Year = rtc.getYear();
 }
 
 // time setting functions

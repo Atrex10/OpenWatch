@@ -76,9 +76,9 @@ class ClockScreen : public Screen {
         }
 
         void update(int dt) override {
-            hours = curTime.hour;
-            minutes = curTime.minute;
-            seconds = curTime.second;
+            hours = dateTime.Hour;
+            minutes = dateTime.Minute;
+            seconds = dateTime.Second;
 
             batLevel = readBatteryLevel();
         }
@@ -138,9 +138,9 @@ class DateScreen : public Screen {
         }
 
         void update(int dt) override {
-            day = curDate.day;
-            month = curDate.month;
-            year = curDate.year;
+            day = dateTime.Day;
+            month = dateTime.Month;
+            year = dateTime.Year;
 
             batVolt = readBatteryVoltage();
         }
@@ -213,7 +213,7 @@ class StopwatchScreen : public Screen {
         
         void startStopwatch() {
             lastMillis = millis();
-            lastSeconds = curTime.second;
+            lastSeconds = dateTime.Second;
             secondsClicked = true;
 
             secClickMillisOffset = lastSecClickMillis;
@@ -254,9 +254,9 @@ class StopwatchScreen : public Screen {
                 Serial.print("running: ");
                 Serial.println(running); }
             
-            uint8_t newSeconds = curTime.second;
-            uint8_t newMinutes = curTime.minute;
-            uint8_t newHours = curTime.hour;
+            uint8_t newSeconds = dateTime.Second;
+            uint8_t newMinutes = dateTime.Minute;
+            uint8_t newHours = dateTime.Hour;
 
             if (lastSeconds != newSeconds) {
                 lastSecClickMillis = 0;
@@ -323,11 +323,13 @@ class StopwatchScreen : public Screen {
         int handleInput(int button) override {
             switch (button) {
             case 0:
-                return 0;
+                if (!running) {
+                    return 0; }
                 break;
             
             case 1:
-                return -2;
+                if (!running) {
+                    return -2; }
                 break;
             
             case 2:
@@ -411,6 +413,68 @@ class TemperatureScreen : public Screen {
             switch (button) {
             case 0:
                 return 0;
+                break;
+            
+            case 1:
+                return -2;
+                break;
+            
+            default: return -1; break; }
+        }
+};
+
+class TimerScreen : public Screen {
+    public:
+        TimerScreen() {}
+
+        uint8_t minutes;
+        uint8_t seconds;
+
+        uint32_t endEpoch;
+
+        bool running;
+
+        void onEnter() override {
+            setUpdateInterval(1000);
+            setRenderInterval(100);
+            resetTimer();
+            update(1000);
+            render();
+        }
+
+        void onExit() override {
+            display.clearDisplay();
+            display.display();
+        }
+        
+        void startTimer() {
+            running = true;
+
+            setSleepDelay(0);
+        }
+
+        void stopTimer() {
+            running = false;
+        }
+
+        void resetTimer() {
+            setSleepDelay(180);  // 3 min
+        }
+
+        void update(int dt) override {
+            ;
+        }
+
+        void render() override {
+            display.clearDisplay();
+            
+            display.display();
+        }
+
+        int handleInput(int button) override {
+            switch (button) {
+            case 0:
+                return -1;
                 break;
             
             case 1:

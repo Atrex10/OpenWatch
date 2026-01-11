@@ -2,6 +2,7 @@
 #define RTCFUNC_H
 
 #include <DS3231.h>
+#include <TimeLib.h>
 
 struct timeSct {
     uint8_t second;
@@ -22,9 +23,10 @@ struct dateSct {
 extern int timeUpdateInterval; // in ms, how often ticker updates current time
 
 extern DS3231 rtc;
+extern tmElements_t dateTime;
 
-extern timeSct curTime;
-extern dateSct curDate;
+// extern timeSct curTime;
+// extern dateSct curDate;
 
 void updateCurTime();
 void updateCurDate();
