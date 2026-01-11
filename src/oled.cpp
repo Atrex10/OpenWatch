@@ -20,7 +20,7 @@ void displayClockNum(int num, int x, int y) {
 }
 
 void displayClockNums(int nums, int x, int y, int spacing) {
-    // the nums value HAS to be 2 digit for wanted behavion
+    // the nums value HAS to be 2 or 3 digit for wanted behavior
     int num1 = 0;
     int num2 = 0;
 

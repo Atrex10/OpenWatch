@@ -7,6 +7,7 @@
 #include "mainHeader.h"
 #include "rtcFunc.h"
 #include "sensors.h"
+#include "TimeLib.h"
 
 // ________DUMMY________
 class DummyScreen : public Screen {
@@ -108,6 +109,10 @@ class ClockScreen : public Screen {
             
             case 2:
                 return 2; // date screen
+                break;
+            
+            case 3:
+                return 3; // timer screen
                 break;
             
             default: return -1; break; }
@@ -324,12 +329,18 @@ class StopwatchScreen : public Screen {
             switch (button) {
             case 0:
                 if (!running) {
-                    return 0; }
+                    return 0;
+                } else {
+                    return -1;
+                }
                 break;
             
             case 1:
                 if (!running) {
-                    return -2; }
+                    return -2;
+                } else {
+                    return -1;
+                }
                 break;
             
             case 2:
@@ -423,26 +434,40 @@ class TemperatureScreen : public Screen {
         }
 };
 
+// ________TIMER________
 class TimerScreen : public Screen {
     public:
         TimerScreen() {}
 
-        uint8_t minutes;
-        uint8_t seconds;
+        int8_t setMinutes;
+        int8_t setSeconds;
 
-        uint32_t endEpoch;
+        int curSetting;  // index of the setting that is currently being set
+                            // 0 - start
+                            // 1 - minutes
+                            // 2 - seconds
+
+        int8_t minutes;
+        int8_t seconds;
+
+        uint32_t endTimestamp;
 
         bool running;
+        bool finished;
+        bool invertedDisplay;
 
         void onEnter() override {
-            setUpdateInterval(1000);
+            setUpdateInterval(100);
             setRenderInterval(100);
             resetTimer();
+            setMinutes = 10;  // small time by deafult for easier usage
             update(1000);
             render();
         }
 
         void onExit() override {
+            setSleepDelay(0, true);  // set deafult
+
             display.clearDisplay();
             display.display();
         }
@@ -450,38 +475,198 @@ class TimerScreen : public Screen {
         void startTimer() {
             running = true;
 
+            // calculating end epoch
+            uint32_t curTimestamp = makeTime(dateTime);
+            uint16_t timerTime = 60 * setMinutes + setSeconds;
+            endTimestamp = curTimestamp + timerTime;
+
             setSleepDelay(0);
         }
 
         void stopTimer() {
             running = false;
+
+            // setting time to what is left so it is possible to resume the timer
+            setMinutes = minutes;
+            setSeconds = seconds;
         }
 
         void resetTimer() {
+            running = false;
+            finished = false;
+            invertedDisplay = false;
+            curSetting = 1;  // set minutes
+
+            setMinutes = 0;
+            setSeconds = 0;
+
+            minutes = 0;
+            seconds = 0;
+
+            endTimestamp = 0;
+
             setSleepDelay(180);  // 3 min
         }
 
         void update(int dt) override {
-            ;
+            if (running) {
+                // calculating time left on timer
+                uint32_t curTimestamp = makeTime(dateTime);
+                int16_t timerTime = (endTimestamp - curTimestamp);
+                if (debug) {
+                    Serial.println(timerTime);
+                }
+
+                // timerTime will be going up when the timer expires
+                minutes = abs(timerTime) / 60;
+                seconds = abs(timerTime) % 60;
+                
+                if (timerTime <= 0) {
+                    finished = true;
+                }
+
+                // trimming minutes and seconds to avoid errors
+                if (minutes > 99) {
+                    minutes = 0;
+                } else if (minutes < 0) {
+                    minutes = 99;
+                }
+                if (seconds >= 60) {
+                    seconds = 0;
+                } else if (seconds < 0) {
+                    seconds = 59;
+                }
+            }
         }
 
         void render() override {
             display.clearDisplay();
+
+            if (displayDots) {
+                    displayMiddleDot(true); }
+                
+            displayText("Timer", segmentsCoords[2][0]-16, segmentsCoords[2][1]);
+
+            if (running) {
+                displayClockNums(minutes, segmentsCoords[0][0], segmentsCoords[0][1]);
+                displayClockNums(seconds, segmentsCoords[1][0], segmentsCoords[1][1]);
+
+                if (finished) {
+                    displayText("=========", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                }
+                
+            } else {
+                displayClockNums(setMinutes, segmentsCoords[0][0], segmentsCoords[0][1]);
+                displayClockNums(setSeconds, segmentsCoords[1][0], segmentsCoords[1][1]);
+
+                switch (curSetting) {
+                case 1:
+                    displayText("min", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                    break;
+                case 2:
+                    displayText("sec", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                    break;
+                
+                default:
+                    displayText("start", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                    break;
+                }
+            }
             
             display.display();
         }
 
-        int handleInput(int button) override {
-            switch (button) {
+        // INPUT HELPERS
+        void cycleSettingModes() {
+            curSetting++;
+            if (curSetting > 2) {
+                curSetting = 0; }
+        }
+
+        void increaseCurSetting() {
+            switch (curSetting)
+            {
             case 0:
-                return -1;
+                startTimer();
                 break;
             
             case 1:
-                return -2;
+                setMinutes++;
+                if (setMinutes >= 100) {
+                    setMinutes = 0;
+                }
                 break;
             
-            default: return -1; break; }
+            case 2:
+                setSeconds++;
+                if (setSeconds >= 60) {
+                    setSeconds = 0;
+                }
+                break;
+            
+            default: break; }
+        }
+
+        void decreaseCurSetting() {
+            switch (curSetting)
+            {
+            case 0:  // you can't stop a timer before it started
+                break;
+            
+            case 1:
+                setMinutes--;
+                if (setMinutes < 0) {
+                    setMinutes = 60;
+                }
+                break;
+            
+            case 2:
+                setSeconds--;
+                if (setSeconds < 0) {
+                    setSeconds = 59;
+                }
+                break;
+            
+            default: break; }
+        }
+
+        int handleInput(int button) override {
+            if (running) {
+                switch (button) {
+                    case 2:
+                        stopTimer();
+                        resetTimer();
+                        return -1;
+                        break;
+                    
+                    case 3:
+                        stopTimer();
+                        return -1;
+                        break;
+                default: return -1; break; }
+            } else {
+                switch (button) {
+                    case 0:
+                        return -2;
+                        break;
+                    
+                    case 1:
+                        cycleSettingModes();
+                        return -1;
+                        break;
+                    
+                    case 2:
+                        decreaseCurSetting();
+                        return -1;
+                        break;
+                    
+                    case 3:
+                        increaseCurSetting();
+                        return -1;
+                        break;
+
+                default: return -1; break; }
+            }
         }
 };
 

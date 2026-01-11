@@ -179,14 +179,16 @@ int renderInterval = 1000;// in ms, screen render interval, set by each screen i
 // creating screens instances
 ClockScreen scrClock;
 StopwatchScreen scrStopwatch;
+TimerScreen scrTimer;
 DateScreen scrDate;
 WiFiTimeScreen scrWiFiT;
 
-const uint8_t numOfScreens = 4;
+const uint8_t numOfScreens = 5;
 Screen* screens[numOfScreens] = {
   &scrClock,
   &scrStopwatch,
   &scrDate,
+  &scrTimer,
   &scrWiFiT,
 };
 
