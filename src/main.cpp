@@ -10,6 +10,8 @@
 #include <DS3231.h>
 #include <Ticker.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
+#include <esp_bt.h>
 
 #include "oled.h"
 #include "rtcFunc.h"
@@ -40,6 +42,8 @@ bool touchWakeFlag = false;
 
 const int touchWakeSleepDelay = 4;
 const int normalWakeSleepDelay = 6;
+
+const int cpuSpeed = 80;  // MHz, for esp32 c6 deafult is 160; valid options: 240, 160, 80, 40
 
 // ============ TIME UPDATES THINGS ============
 // =============================================
@@ -248,6 +252,9 @@ void setButtonInterval(int interval) {
 // ============ STANDARD ARDUINO FUNCTIONS ============
 // ====================================================
 void appSetup() {
+  // hardware settings
+  setCpuFrequencyMhz(cpuSpeed);
+
   // updating deepsleep activity counter (not important for boot, only for waking up)
   lastActivityMillis = millis();
 
@@ -348,6 +355,14 @@ void appSetup() {
     WiFi.setSleep(true);
     disableWiFi();
   }
+
+  // disabling wifi, ble & serial (if not debugging) after (maybe) syncing clock
+  esp_wifi_stop();
+  esp_wifi_deinit();
+  esp_bt_controller_disable();
+  esp_bt_controller_deinit();
+  if (!debug) {
+    Serial.end(); }
 }
 
 void appLoop() {
