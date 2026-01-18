@@ -22,7 +22,7 @@
 
 // ============ IMPORTANT VARIABLES ============
 // =============================================
-const bool debug = false; // debug flag, starts serial and prints info there
+const bool debug = true; // debug flag, starts serial and prints info there
 const bool displayDots = true;
 
 // buttons variables

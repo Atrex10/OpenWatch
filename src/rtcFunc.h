@@ -3,6 +3,8 @@
 
 #include <DS3231.h>
 #include <TimeLib.h>
+#include <time.h>
+#include <sys/time.h>
 
 struct timeSct {
     uint8_t second;
@@ -22,7 +24,6 @@ struct dateSct {
 
 extern int timeUpdateInterval; // in ms, how often ticker updates current time
 
-extern DS3231 rtc;
 extern tmElements_t dateTime;
 
 // extern timeSct curTime;
