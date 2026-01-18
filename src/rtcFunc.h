@@ -3,7 +3,8 @@
 
 #include <DS3231.h>
 #include <TimeLib.h>
-#include <ESP32Time.h>
+#include <time.h>
+#include <sys/time.h>
 
 struct timeSct {
     uint8_t second;

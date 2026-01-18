@@ -2,10 +2,11 @@
 
 #include <DS3231.h>
 #include <TimeLib.h>
-#include <ESP32Time.h>
+#include <time.h>
+#include <sys/time.h>
 #include "mainHeader.h"
 
-// #define USE_EXT_RTC
+#define USE_EXT_RTC
 
 #ifdef USE_EXT_RTC
     bool h12 = false;
@@ -15,11 +16,10 @@
 
 #ifdef USE_EXT_RTC
     DS3231 rtc;
-#else
-    ESP32Time rtc;
 #endif
 
-tmElements_t dateTime;
+// presetting time and date to 00:00:00 01.01.2000
+tmElements_t dateTime = {0, 0, 0, 0, 0, 0, 0};
 
 int timeUpdateInterval = 1000;
 
@@ -62,21 +62,52 @@ void setCurDate(dateSct date) {
 }
 
 #else
+// helper function
+time_t getSystemTimestamp() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return tv.tv_sec;
+}
+
 void updateCurTime() {
-    dateTime.Second = rtc.getSecond();
-    dateTime.Minute = rtc.getMinute();
-    dateTime.Hour = rtc.getHour(true);  // true for 24h format
+    tmElements_t tempTime;
+
+    breakTime(getSystemTimestamp(), tempTime);
+
+    dateTime.Second = tempTime.Second;
+    dateTime.Minute = tempTime.Minute;
+    dateTime.Hour = tempTime.Hour;
 }
 
 void updateCurDate() {
-    dateTime.Day = rtc.getDay();
-    dateTime.Month = rtc.getMonth() + 1;  // adding one to account for 0-11 month format
-    dateTime.Year = rtc.getYear();
+    tmElements_t tempTime;
+
+    breakTime(getSystemTimestamp(), tempTime);
+
+    dateTime.Day = tempTime.Day;
+    dateTime.Month = tempTime.Month;
+    dateTime.Year = tempTime.Year - 30;  // converting from years since 1970 format to years since 2000
 }
 
 // time setting functions
 void setCurTime(timeSct time) {
-    rtc.setTime(time.second, time.minute, time.hour, dateTime.Day, dateTime.Month, dateTime.Year);  // only updating time
+    // updating only time, date is the same as current
+    tmElements_t tm;
+    tm.Year = dateTime.Year + 30;  // timelib counts years from 1970, and this code from 2000
+    tm.Month = dateTime.Month;
+    tm.Day = dateTime.Day;
+    tm.Hour = time.hour;
+    tm.Minute = time.minute;
+    tm.Second = time.second;
+
+    time_t t = makeTime(tm); 
+
+    // set ESP system time
+    struct timeval tv = { .tv_sec = t, .tv_usec = 0 };
+    settimeofday(&tv, NULL);
+
+    updateCurTime();
+
     if (debug) {
         Serial.println(time.second);
         Serial.println(time.minute);
@@ -84,7 +115,23 @@ void setCurTime(timeSct time) {
 }
 
 void setCurDate(dateSct date) {
-    rtc.setTime(dateTime.Second, dateTime.Minute, dateTime.Hour, date.day, date.month, date.year);  // only updating date
+    // updating only date, time is the same as current
+    tmElements_t tm;
+    tm.Year = date.year + 30;  // timelib counts years from 1970, and this code from 2000
+    tm.Month = date.month;
+    tm.Day = date.day;
+    tm.Hour = dateTime.Hour;
+    tm.Minute = dateTime.Minute;
+    tm.Second = dateTime.Second;
+
+    time_t t = makeTime(tm); 
+
+    // set ESP system time
+    struct timeval tv = { .tv_sec = t, .tv_usec = 0 };
+    settimeofday(&tv, NULL);
+
+    updateCurDate();
+
     if(debug) {
         Serial.println(date.day);
         Serial.println(date.month);
