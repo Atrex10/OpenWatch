@@ -1,69 +1,8 @@
 #include "sensors.h"
 
-#include <MAX30105.h>
-#include <heartRate.h>
 #include <Wire.h>
 #include <math.h>
 #include "mainHeader.h"
-
-// ============ HEART RATE SENSOR ============
-long HRLastPulseMillis = 0;
-uint8_t HRHeartRate = 0;
-
-MAX30105 HRSensor;
-
-void HRSetup() {
-    bool detected = HRSensor.begin(Wire, I2C_SPEED_STANDARD);
-    if (debug) {
-        Serial.print("MAX30102 module detection: ");
-        Serial.println(detected); }
-
-    HRSensor.setup(
-        0xFF,    // LED brightness
-        4,      // sample average
-        2,      // Red + IR
-        100,    // sample rate
-        411,    // pulse width
-        4096    // ADC range
-    );
-
-    HRSensor.setPulseAmplitudeIR(255);
-    HRSensor.setPulseAmplitudeRed(0);
-
-    HRSensor.clearFIFO();
-    // HRSensor.shutDown();
-}
-
-void HRSleep() {
-    HRSensor.shutDown();
-}
-
-void HRWake() {
-    HRSensor.wakeUp();
-}
-
-void HRUpdatePulse() {
-    if (HRSensor.available()) {
-        long ir = HRSensor.getRed();
-        HRSensor.getIR();
-        // Serial.println(ir);
-        HRSensor.nextSample();
-
-        if (checkForBeat(ir)) {
-            long nowMillis = millis();
-            long diffMillis = nowMillis - HRLastPulseMillis;
-
-            HRLastPulseMillis = nowMillis;
-
-            HRHeartRate = 60.0f / (diffMillis / 1000.0f);  // calculating to BPM
-        }
-    }
-}
-
-int HRGetPulse() {
-    return HRHeartRate;
-}
-
 
 // ============ TEMP. SENSOR (THERMISTOR) ============
 float tempCalibrationSlope = 0.06568;

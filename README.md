@@ -138,7 +138,6 @@ This is the deafult build and upload option, and all the code is set to work wit
 - **Adafruit GFX Library@^1.12.4** from **adafruit**
 - **Adafruit SH110X@^2.1.14** or **adafruit/Adafruit SSD1306@^2.5.16** (depending on your oled's driver) from **adafruit**
 - **DS3231@^1.1.2** from **nothernwidget**
-- **SparkFun MAX3010x Pulse and Prox@^1.1.2** from **sparkfun**
 - **Time@^1.6.1** from **paulstoffregen**\
 To install any missing libraries from this list, in Arduino IDE go to libraries manager and install appropriate versions of missing libraries. 
 ---
