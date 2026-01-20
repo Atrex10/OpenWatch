@@ -1,17 +1,26 @@
 #include <Adafruit_GFX.h>
-#include <Adafruit_SH110X.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
+#include "mainHeader.h"
 #include "oled.h"
 #include "clockNum.h"
 #include "icons.h"
 
-Adafruit_SH1106G display(DISPLAY_WIDTH, DISPLAY_HEIGHT, &Wire, -1);
+#ifndef USE_SSD1306_OLED
+    #include <Adafruit_SH110X.h>
+    Adafruit_SH1106G display(DISPLAY_WIDTH, DISPLAY_HEIGHT, &Wire, -1);
+#else
+    #include <Adafruit_SSD1306.h>
+    Adafruit_SSD1306 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, &Wire, -1);
+#endif
 
 // screen segments start coordinates
 const int segmentsCoords[7][2] = { {0, 0}, {72, 0}, {16, 56}, {80, 56}, {56, 0}, {0, 24}, {72, 24} };
 
 void setDisplayContrast(uint8_t value) {
-    display.setContrast(value);
+    // the contrast function only works for sh1106 oled displays
+    #ifndef USE_SSD1306_OLED
+        display.setContrast(value);
+    #endif
 }
 
 // universal big clock numbers functions

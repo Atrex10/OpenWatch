@@ -1,15 +1,21 @@
-
 #ifndef OLED_H
 #define OLED_H
 
 #include <Adafruit_GFX.h>
-#include <Adafruit_SH110X.h>
 #include <Wire.h>
+#include "mainHeader.h"
+
+#ifndef USE_SSD1306_OLED
+    #include <Adafruit_SH110X.h>
+    extern Adafruit_SH1106G display;
+#else
+    #include <Adafruit_SSD1306.h>
+    extern Adafruit_SSD1306 display;
+#endif
 
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 64
 
-extern Adafruit_SH1106G display;
 
 // screen segments start coordinates
 extern const int segmentsCoords[7][2]; // segments 5 & 6 (index 4 & 5) are not used in usual overlay, only for specific ones

@@ -57,7 +57,15 @@ namespace Config {
 
 #endif
 ```
-Change the dummy ssid and password values for the real ones the code is going to try to connect in order to synchronizes time from UDP server.
+Change the dummy ssid and password values for the real ones the code is going to try to connect to in order to synchronizes time from UDP server.
+___
+### Changing display contrast
+If the display is to dim to you, change the `displayContrast` variable in `main.cpp`. It takes values from **0** to **255**
+___
+### Changing oled driver
+Deafult option for oled display driver is **sh1106**. If you want to use **ssd1306**, head to `mainHeader.h` and uncomment the line `#define USE_SSD1306_OLED`.
+
+**Note:** The contrast setting **does not work with ssd1306** displays, so changing it won't have any effect.
 ___
 ### Adjusting battery voltage divider adc
 To change the pin your battery voltage divider is connected to, change the `batteryAdcPin` variable in `main.cpp`.
@@ -128,7 +136,7 @@ This firmware is meant for small (wearable?) devices **running on battery**, so 
 ### Arduino IDE uploading
 This is the deafult build and upload option, and all the code is set to work with it by deafult. To use it open the `src/` folder in arduino IDE. Here is the list of needed libraries for this project:
 - **Adafruit GFX Library@^1.12.4** from **adafruit**
-- **Adafruit SH110X@^2.1.14** from **adafruit**
+- **Adafruit SH110X@^2.1.14** or **adafruit/Adafruit SSD1306@^2.5.16** (depending on your oled's driver) from **adafruit**
 - **DS3231@^1.1.2** from **nothernwidget**
 - **SparkFun MAX3010x Pulse and Prox@^1.1.2** from **sparkfun**
 - **Time@^1.6.1** from **paulstoffregen**\

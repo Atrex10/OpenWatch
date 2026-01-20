@@ -317,7 +317,11 @@ void appSetup() {
   Wire.begin();
 
   // initiating oled
-  display.begin(0x3C, true);
+  #ifndef USE_SSD1306_OLED
+    display.begin(0x3C, true);
+  #else
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  #endif
   display.clearDisplay();
   display.display();
   // setting display brightness to predefined value
