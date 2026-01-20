@@ -1,6 +1,10 @@
 #ifndef MAINHEADER_H
 #define MAINHEDER_H
 
+// HARDWARE CONFIGURATION
+#define USE_EXT_RTC
+#define USE_BATTERY
+
 // main arduino functions for src.ino
 void appSetup();
 void appLoop();

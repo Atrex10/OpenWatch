@@ -64,10 +64,10 @@ To change the pin your battery voltage divider is connected to, change the `batt
 
 To change the voltage divider factor (see hardware, pt. 6 for formula) change the `batteryVoltDivFac` value in `main.cpp`.
 
-**Note:** If you're not using a battery, either edit the `readBatteryVoltage()` function in `main.cpp` to always return over **4100** or short the adc pin to 3.3V. This should be done to prevent the code from going into *critical battery* mode and making your device unusable.
+**Note:** If you're not using a battery, comment the `#define USE_BATTERY` line in `mainHeader.h`. This should be done to prevent the code from going into *critical battery* mode and making your device unusable.
 ___
 ### Disabling external rtc
-If you don't want to use an external rtc module and the internal timer precision is good enough for your purpouse, you can disable external rtc by commenting the `#define USE_EXT_RTC` line in `rtcFunc.cpp` file. This will make the esp use its internal rtc.
+If you don't want to use an external rtc module and the internal timer precision is good enough for your purpouse, you can disable external rtc by commenting the `#define USE_EXT_RTC` line in `mainHeader.h` file. This will make the esp use its internal rtc.
 ***
 ***
 ## Navigation and functionality

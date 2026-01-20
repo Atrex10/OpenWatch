@@ -6,8 +6,6 @@
 #include <sys/time.h>
 #include "mainHeader.h"
 
-#define USE_EXT_RTC
-
 #ifdef USE_EXT_RTC
     bool h12 = false;
     bool hPM = false;

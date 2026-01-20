@@ -13,6 +13,7 @@
 #include <esp_wifi.h>
 #include <esp_bt.h>
 
+#include "mainHeader.h"
 #include "oled.h"
 #include "rtcFunc.h"
 #include "WiFiTime.h"
@@ -22,7 +23,7 @@
 
 // ============ IMPORTANT VARIABLES ============
 // =============================================
-const bool debug = true; // debug flag, starts serial and prints info there
+const bool debug = false; // debug flag, starts serial and prints info there
 const bool displayDots = true;
 
 // buttons variables
@@ -126,8 +127,12 @@ bool buttonPressed(int id) {
 // ===============================
 // adc with voltage divider reading
 float readAdcVoltDiv(int pin, float factor) {
-  // reads voltage on specified pin and multiplies the value by given factor to compensate for voltage divider
-  return factor * analogReadMilliVolts(pin);
+  #ifdef USE_BATTERY
+    // reads voltage on specified pin and multiplies the value by given factor to compensate for voltage divider
+    return factor * analogReadMilliVolts(pin);
+  #else
+    return 5000;  // always display full battery
+  #endif
 }
 
 // battery level reading
