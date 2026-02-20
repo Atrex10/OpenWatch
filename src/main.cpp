@@ -31,6 +31,12 @@ const int wakePins[2] = {0, 2};
 const int buttonPins[4] = {0, 19, 20, 18};
 bool buttonStates[4] = {false, false, false, false};
 
+// if buzzer not used set buzzerPin to anything, it won't be used
+const int buzzerPin = 21;
+const uint16_t buzzerFrequency = 2700;  // in Hz, the frequency of buzzer beeping on alarm
+const uint16_t buzzerBeepDuration = 20;  // in ms, the amount of time each beep on alarm takes. Set to less than screen's update interval (100ms for timer)
+const uint16_t buzzerAlarmDuration = 3;  // in s, how long the buzzer will beep before stopping
+
 const int batteryAdcPin = 1;
 
 const int thermistorADCPin = 2;
@@ -178,6 +184,15 @@ void checkLowBattery() {
 
 Ticker batteryControlTicker; // this ticker reads battery level to shut down the device if battery is critical low
 
+// buzzer handling
+void playBuzzer(int freq, int duration) {
+  #ifdef USE_BUZZER_ALARM
+    tone(buzzerPin, freq, duration);
+  #endif
+  return;
+}
+
+
 // ============ SCREEN MANAGER  ============
 // =========================================
 int buttonCheckInterval = 10; // in ms, button checker interval, not effective when lower than 10
@@ -296,6 +311,11 @@ void appSetup() {
   pinMode(wakePins[0], INPUT_PULLUP);
   pinMode(wakePins[1], INPUT_PULLUP);
 
+  #ifdef USE_BUZZER_ALARM
+    pinMode(buzzerPin, OUTPUT);
+    digitalWrite(buzzerPin, LOW);
+  #endif
+
   pinMode(buttonPins[0], INPUT_PULLUP);
   pinMode(buttonPins[1], INPUT_PULLUP);
   pinMode(buttonPins[2], INPUT_PULLUP);
@@ -370,8 +390,9 @@ void appSetup() {
   esp_wifi_deinit();
   esp_bt_controller_disable();
   esp_bt_controller_deinit();
-  if (!debug) {
-    Serial.end(); }
+  // desabled because of problems while uploading
+  // if (!debug) {
+  //   Serial.end(); }
 }
 
 void appLoop() {

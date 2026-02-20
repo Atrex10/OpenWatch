@@ -68,6 +68,7 @@ class ClockScreen : public Screen {
             setRenderInterval(1000);
             setSleepDelay(10);
             update(1000);
+            delay(1);
             render();
         }
 
@@ -446,11 +447,15 @@ class TimerScreen : public Screen {
                             // 0 - start
                             // 1 - minutes
                             // 2 - seconds
+                            // 3 - alarm
 
         int8_t minutes;
         int8_t seconds;
 
         uint32_t endTimestamp;
+
+        bool alarmArm;
+        bool alarmConfirmed;
 
         bool running;
         bool finished;
@@ -461,7 +466,8 @@ class TimerScreen : public Screen {
             setRenderInterval(100);
             resetTimer();
             setMinutes = 10;  // small time by deafult for easier usage
-            update(1000);
+            alarmArm = false;  // stealth mode by deafult
+            update(100);
             render();
         }
 
@@ -474,6 +480,7 @@ class TimerScreen : public Screen {
         
         void startTimer() {
             running = true;
+            alarmConfirmed = false;
 
             // calculating end epoch
             uint32_t curTimestamp = makeTime(dateTime);
@@ -485,6 +492,7 @@ class TimerScreen : public Screen {
 
         void stopTimer() {
             running = false;
+            alarmConfirmed = true;
 
             // setting time to what is left so it is possible to resume the timer
             setMinutes = minutes;
@@ -494,6 +502,7 @@ class TimerScreen : public Screen {
         void resetTimer() {
             running = false;
             finished = false;
+            alarmConfirmed = true;
             displayOn = true;
             curSetting = 1;  // set minutes
 
@@ -512,6 +521,15 @@ class TimerScreen : public Screen {
             // this function will be called once when the timer expires
             displayOn = true;
         }
+        
+        void timerAlarm() {
+            // this function will be called once every update when the timer expires
+            if (minutes == 0 && seconds <= buzzerAlarmDuration) {
+                if (!alarmConfirmed && alarmArm) {  // the buzzer is only going to beep for the first given amount of seconds
+                    playBuzzer(buzzerFrequency, buzzerBeepDuration);
+                }
+            }
+        }
 
         void update(int dt) override {
             if (running) {
@@ -529,6 +547,9 @@ class TimerScreen : public Screen {
                 if (timerTime <= 0 && !finished) {
                     finished = true;
                     timerSetOff();
+                }
+                if (finished) {
+                    timerAlarm();
                 }
 
                 // trimming minutes and seconds to avoid errors
@@ -570,6 +591,13 @@ class TimerScreen : public Screen {
                     case 2:
                         displayText("sec", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
                         break;
+                    case 3:
+                        if (alarmArm) {
+                            displayText("a:on", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                        } else {
+                            displayText("a:off", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
+                        }
+                        break;
                     
                     default:
                         displayText("start", segmentsCoords[3][0]-16, segmentsCoords[3][1]);
@@ -586,7 +614,7 @@ class TimerScreen : public Screen {
         // INPUT HELPERS
         void cycleSettingModes() {
             curSetting++;
-            if (curSetting > 2) {
+            if (curSetting > 3) {
                 curSetting = 0; }
         }
 
@@ -611,6 +639,9 @@ class TimerScreen : public Screen {
                 }
                 break;
             
+            case 3:
+                alarmArm = true;
+            
             default: break; }
         }
 
@@ -634,6 +665,9 @@ class TimerScreen : public Screen {
                 }
                 break;
             
+            case 3:
+                alarmArm = false;
+            
             default: break; }
         }
 
@@ -645,6 +679,7 @@ class TimerScreen : public Screen {
                             displayOn = !displayOn;
                         } else {
                             displayOn = true;
+                            alarmConfirmed = true;
                         }
                         return -1;
                         break;

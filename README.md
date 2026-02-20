@@ -5,19 +5,20 @@
 This is a simple firmware meant for **wrist watches** that provides regular digital watch functionality with ability to easly add sensors, feedback devices, and other functionality.
 
 ## Hardware
-This is a list of hardware the code was tested on:
+This is a list of hardware the code was tested on:\
+**Note:** * symbol means certain hardware is not necessary 
 1. **MCU board:**\
     xiao esp32c6/esp32c3 super mini
 2. **Display:**\
-    monochrome 128x64 oled display
-3. **RTC:**\
-    DS3231
+    monochrome 128x64 oled display, connected with i2c
+3. ***RTC:**\
+    DS3231, connected with i2c
 4. **Buttons:**
     - 3 tact switches connected to gpio specified in `buttonPins` in `main.cpp`.
     - 1-2 tact switches connected to gpio that is capable of waking the chip up from deepsleep (Depending on the board it can be labeled as RTC Pin or LP Pin or other) specified in `wakePins` in `main.cpp`.
-5. **Battery:**\
-    Any cell that supports li-po/li-ion charging. Not necessary, see user's guide if not used.
-6. **Battery voltage divider:**
+5. ***Battery:**\
+    Any cell that supports li-po/li-ion charging. See user's guide if not used.
+6. ***Battery voltage divider:**
     - connections:
         ```
         GND -- R1 -- ADC -- R2 -- BAT+
@@ -31,6 +32,10 @@ This is a list of hardware the code was tested on:
         `batteryVoltDivFac` deafult value is 2.0.
 
         ADC is an analog pin specified by `batteryAdcPin` in `main.cpp`.\
+7. ***Buzzer:**\
+    **Passive buzzer** connected to gpio specified in `buzzerPin` in `main.cpp`, used for signaling the timer end.\
+
+    **Note:** most boards' gpio cannot supply enough current to power devices like buzzers, you will most probably have to use a MOSFET/bipolar transistor to control the buzzer safely.
 
 ***
 ***
@@ -52,12 +57,12 @@ To configure your device to connect to your network (home wifi, hotspot, or anyt
 
 namespace Config {
     WiFiEntry WiFiNetworks[] = {{"Network1_ssid", "Network1_pass"},
-                                "Network1_ssid", "Network2_pass"};
+                                "Network2_ssid", "Network2_pass"};
 };
 
 #endif
 ```
-Change the dummy ssid and password values for the real ones the code is going to try to connect to in order to synchronizes time from UDP server.
+Change the dummy ssid and password values for the real ones the code is going to try connecting to in order to synchronize time from UDP server.
 ___
 ### Changing display contrast
 If the display is to dim to you, change the `displayContrast` variable in `main.cpp`. It takes values from **0** to **255**
@@ -76,6 +81,9 @@ To change the voltage divider factor (see hardware, pt. 6 for formula) change th
 ___
 ### Disabling external rtc
 If you don't want to use an external rtc module and the internal timer precision is good enough for your purpouse, you can disable external rtc by commenting the `#define USE_EXT_RTC` line in `mainHeader.h` file. This will make the esp use its internal rtc.
+___
+### Disabling buzzer alarm
+If you don't want to use a buzzer for timer alarm, you can disable it by commenting the `#define USE_BUZZER_ALARM` line in `mainHeader.h`. This way, the timer end will only trigger the screen to turn on.
 ***
 ***
 ## Navigation and functionality
@@ -117,7 +125,7 @@ The firmware's functionality is separated in form of screens, each of which prov
         - 2: **decrease** current setting option
         - 3: **increase** current setting option
     - navigation while running (buttons):
-        - 0: **turn on/off** display
+        - 0: **turn on/off** display, **confirm alarm** if timer expired
         - 2: **stop & reset** the timer
         - 3: **stop** the timer
 
