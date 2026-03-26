@@ -10,6 +10,6 @@ extern const unsigned char clockNumBmps[10][144];
 extern const int AODClockNumWidhts[10];
 extern const int AODClockNumHeights[10];
 
-extern const unsigned char AODClockNumBmps[10][144];
+extern const unsigned char AODClockNumBmps[10][64];
 
 #endif

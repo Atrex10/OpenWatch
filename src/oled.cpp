@@ -24,11 +24,15 @@ void setDisplayContrast(uint8_t value) {
 }
 
 // universal big clock numbers functions
-void displayClockNum(int num, int x, int y) {
-    display.drawBitmap(x, y, clockNumBmps[num], clockNumWidhts[num], clockNumHeights[num], 1);
+void displayClockNum(int num, int x, int y, bool small) {
+    if (!small) {
+        display.drawBitmap(x, y, clockNumBmps[num], clockNumWidhts[num], clockNumHeights[num], 1);
+    } else {
+        display.drawBitmap(x, y, AODClockNumBmps[num], AODClockNumWidhts[num], AODClockNumHeights[num], 1);
+    }
 }
 
-void displayClockNums(int nums, int x, int y, int spacing) {
+void displayClockNums(int nums, int x, int y, int spacing, bool small) {
     // the nums value HAS to be 2 or 3 digit for wanted behavior
     int num1 = 0;
     int num2 = 0;
@@ -41,8 +45,12 @@ void displayClockNums(int nums, int x, int y, int spacing) {
         num2 = nums % 100;
     }
 
-    displayClockNum(num1, x, y);
-    displayClockNum(num2, (x + clockNumWidhts[num2] + spacing), y);
+    displayClockNum(num1, x, y, small);
+    if (!small) {
+        displayClockNum(num2, (x + clockNumWidhts[num1] + spacing), y, small);
+    } else {
+        displayClockNum(num2, (x + AODClockNumWidhts[num1] + spacing), y, small);
+    }
 }
 
 void displayMiddleDot(bool doubleDot) {

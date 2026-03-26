@@ -24,8 +24,8 @@ extern const int segmentsCoords[7][2]; // segments 5 & 6 (index 4 & 5) are not u
 void setDisplayContrast(uint8_t value);
 
 // universal big clock numbers functions
-void displayClockNum(int num, int x=0, int y=0);
-void displayClockNums(int nums, int x=0, int y=0, int spacing=8);
+void displayClockNum(int num, int x=0, int y=0, bool small = false);
+void displayClockNums(int nums, int x=0, int y=0, int spacing=8, bool small = false);
 void displayMiddleDot(bool doubleDot = false);
 
 // universal text display functions
