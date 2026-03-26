@@ -24,7 +24,7 @@ void setRenderInterval(int interval);
 void setButtonInterval(int interval);
 
 void setSleepDelay(int delay, bool setDeafult=false);
-void deepsleep();
+void deepsleep(bool clearDisplay = false);
 
 extern const uint8_t numOfScreens;
 

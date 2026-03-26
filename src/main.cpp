@@ -20,6 +20,7 @@
 #include "sensors.h"
 #include "screens.h"
 #include "screenMgr.h"
+#include "alwaysOnDsp.h"
 
 // ============ IMPORTANT VARIABLES ============
 // =============================================
@@ -75,14 +76,18 @@ void setSleepDelay(int delay, bool setDeafult) {
    sleepDelaySec = delay; }
 }
 
-void deepsleep(){
-  // clearing the oled display so it doesnt consume power
-  display.clearDisplay();
-  display.display();
-
+void deepsleep(bool clearDisplay){
+  if (AODEnabled) {
+    putOnAOD();
+    setAODWakeUpTimer();
+  } else if (clearDisplay) {
+    // clearing the oled display so it doesnt consume power
+    display.clearDisplay();
+    display.display();
+  }
+  
   // disabling Thermistor
   disableThermistor();
-  delay(100);
 
   esp_deep_sleep_enable_gpio_wakeup(1ULL <<wakePins[0], ESP_GPIO_WAKEUP_GPIO_LOW);
   esp_deep_sleep_enable_gpio_wakeup(1ULL <<wakePins[1], ESP_GPIO_WAKEUP_GPIO_LOW);
@@ -275,24 +280,48 @@ void appSetup() {
   // hardware settings
   setCpuFrequencyMhz(cpuSpeed);
 
-  // updating deepsleep activity counter (not important for boot, only for waking up)
-  lastActivityMillis = millis();
-
-  esp_sleep_wakeup_cause_t wakeCcause = esp_sleep_get_wakeup_cause();
-
-  if (wakeCcause == ESP_SLEEP_WAKEUP_GPIO) {
-    uint64_t wakeUpPins = esp_sleep_get_gpio_wakeup_status();
-
-    if (wakeUpPins & (1ULL << wakePins[1])) {
-      touchWakeFlag = true;  // woke up with touch sensor
-    }
-  }
-
   // initiating serial for debug
   if (debug) {
     Serial.begin(115200);
     delay(200);
     Serial.println("Serial intialized corectly"); }
+
+  // initiating wire
+  Wire.begin();
+
+  // initiating oled
+  #ifndef USE_SSD1306_OLED
+    display.begin(0x3C, true);
+  #else
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  #endif
+  display.clearDisplay();
+  display.display();
+  // setting display brightness to predefined value
+  setDisplayContrast(displayContrast);
+
+  // initiating wake pins
+  pinMode(wakePins[0], INPUT_PULLUP);
+  pinMode(wakePins[1], INPUT_PULLUP);
+
+  // updating deepsleep activity counter (not important for boot, only for waking up)
+  lastActivityMillis = millis();
+
+  esp_sleep_wakeup_cause_t wakeCause = esp_sleep_get_wakeup_cause();
+  
+  if (wakeCause == ESP_SLEEP_WAKEUP_GPIO) {
+    uint64_t wakeUpPins = esp_sleep_get_gpio_wakeup_status();
+
+    if (wakeUpPins & (1ULL << wakePins[1])) {
+      touchWakeFlag = true;  // woke up with touch sensor
+    }
+  } else if (wakeCause == ESP_SLEEP_WAKEUP_TIMER) {
+    // Always-on display updates in deepsleep function
+    updateCurTime();
+    delay(2);
+    deepsleep();
+    while(1);
+  }
 
   // tickers
   deepsleepTicker.attach_ms(deepsleepTickerInterval, autoDeepsleepCheck);
@@ -308,9 +337,6 @@ void appSetup() {
   analogReadResolution(12);
 
   // initiating pins
-  pinMode(wakePins[0], INPUT_PULLUP);
-  pinMode(wakePins[1], INPUT_PULLUP);
-
   #ifdef USE_BUZZER_ALARM
     pinMode(buzzerPin, OUTPUT);
     digitalWrite(buzzerPin, LOW);
@@ -332,20 +358,6 @@ void appSetup() {
   attachInterrupt(digitalPinToInterrupt(buttonPins[1]), handleBut1, FALLING);
   attachInterrupt(digitalPinToInterrupt(buttonPins[2]), handleBut2, FALLING);
   attachInterrupt(digitalPinToInterrupt(buttonPins[3]), handleBut3, FALLING);
-  
-  // initiating wire
-  Wire.begin();
-
-  // initiating oled
-  #ifndef USE_SSD1306_OLED
-    display.begin(0x3C, true);
-  #else
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  #endif
-  display.clearDisplay();
-  display.display();
-  // setting display brightness to predefined value
-  setDisplayContrast(displayContrast);
 
   // updating time and date just to make sure they are fully up to date
   updateTimeAndDate();

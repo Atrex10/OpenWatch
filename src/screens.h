@@ -101,6 +101,7 @@ class ClockScreen : public Screen {
         int handleInput(int button) override {
             switch (button) {
             case 0:
+                // TODO: add AOD setting
                 return -1;
                 break;
             
