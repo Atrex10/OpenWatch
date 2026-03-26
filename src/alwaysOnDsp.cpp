@@ -4,6 +4,12 @@
 
 bool AODEnabled = true;
 
+const int AODClockSegments[4][2][2] = { {{0, 0}, {44, 0}}, 
+                                        {{40, 0}, {84, 0}}, 
+                                        {{0, 32}, {44, 32}}, 
+                                        {{40, 32}, {84, 32}}};
+const int numsSpacing = 4;
+
 void enableAOD() {
     AODEnabled = true;
 }
@@ -20,8 +26,20 @@ void setAODWakeUpTimer() {
 
 void putOnAOD() {
     display.clearDisplay();
-    // TODO: write layout
-    displayClockNums(dateTime.Second, 10, 10, 6);
+    
+    int currentSegment = dateTime.Minute % 4;
+
+    displayClockNums(dateTime.Hour, 
+                    AODClockSegments[currentSegment][0][0], 
+                    AODClockSegments[currentSegment][0][1],
+                    numsSpacing, true);
+    
+    displayClockNums(dateTime.Minute, 
+        AODClockSegments[currentSegment][1][0], 
+        AODClockSegments[currentSegment][1][1],
+        numsSpacing, true);
+
+    // displayClockNums(dateTime.Second, 10, 10, 6);
 
     display.display();
 }
