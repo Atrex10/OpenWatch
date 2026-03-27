@@ -8,6 +8,7 @@
 #include "rtcFunc.h"
 #include "sensors.h"
 #include "TimeLib.h"
+#include "alwaysOnDsp.h"
 
 // ________DUMMY________
 class DummyScreen : public Screen {
@@ -723,16 +724,17 @@ class TimerScreen : public Screen {
 };
 
 // ________SETTINGS SCREEN________
-// (unused, adapt when there will be need to)
 class SettingsScreen : public Screen {
     public:
         SettingsScreen() {}
 
-        // settings values (unused for now)
+        // settings values
+        uint8_t numOfSettings = 1;
         uint8_t currentSettingId = 0;
+
         
         void onEnter() override {
-            setUpdateInterval(1000);
+            setUpdateInterval(100);
             setRenderInterval(100);
             setSleepDelay(45);
             update(1000);
@@ -749,7 +751,51 @@ class SettingsScreen : public Screen {
         }
 
         void render() {
-            ;
+            display.clearDisplay();
+            
+            // drawing subtitle
+            displayText("Settings", segmentsCoords[2][0], segmentsCoords[2][1]);
+            
+            // drawing settings lines, 16px is for current setting indicator
+            // for next line offset y by 24
+            displayText("Alw On", 16, 0+8);
+
+            // drawing settings values
+            displayText(AODEnabled ? "On" : "Off", 88, 0+8);
+
+            // drawing current setting indicator
+            switch (currentSettingId)
+            {
+            case 0:
+                displayText("*", 0, 0+8);
+                break;
+            default:
+                break;
+            }
+
+            display.display();
+        }
+
+        void cycleSettingModes() {
+            currentSettingId++;
+            if (currentSettingId >= numOfSettings) {
+                currentSettingId = 0; }
+        }
+
+        void switchCurSetting() {
+            switch (currentSettingId)
+            {
+            case 0:
+                if (AODEnabled) {
+                    disableAOD();
+                } else {
+                    enableAOD();
+                }
+                break;
+            
+            default:
+                break;
+            }
         }
         
         int handleInput(int button) override {
@@ -761,6 +807,13 @@ class SettingsScreen : public Screen {
             case 1:
                 return -2;
                 break;
+
+            case 2:
+                cycleSettingModes();
+                break;
+            
+            case 3:
+                switchCurSetting();
             
             default: return -1; break; }
         }

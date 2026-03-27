@@ -211,13 +211,15 @@ StopwatchScreen scrStopwatch;
 TimerScreen scrTimer;
 DateScreen scrDate;
 WiFiTimeScreen scrWiFiT;
+SettingsScreen scrSetting;
 
-const uint8_t numOfScreens = 5;
+const uint8_t numOfScreens = 6;
 Screen* screens[numOfScreens] = {
   &scrClock,
   &scrStopwatch,
   &scrDate,
   &scrTimer,
+  &scrSetting,
   &scrWiFiT,
 };
 

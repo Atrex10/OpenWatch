@@ -2,7 +2,9 @@
 #include "rtcFunc.h"
 #include "oled.h"
 
-bool AODEnabled = true;
+#include "Arduino.h"
+
+RTC_DATA_ATTR bool AODEnabled = true;
 
 const int AODClockSegments[4][2][2] = { {{0, 0}, {44, 0}}, 
                                         {{40, 0}, {84, 0}}, 
