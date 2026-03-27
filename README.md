@@ -33,7 +33,7 @@ This is a list of hardware the code was tested on:\
 
         ADC is an analog pin specified by `batteryAdcPin` in `main.cpp`.\
 7. ***Buzzer:**\
-    **Passive buzzer** connected to gpio specified in `buzzerPin` in `main.cpp`, used for signaling the timer end.\
+    **Passive buzzer** connected to gpio specified in `buzzerPin` in `main.cpp`, used for signaling the timer end.
 
     **Note:** most boards' gpio cannot supply enough current to power devices like buzzers, you will most probably have to use a MOSFET/bipolar transistor to control the buzzer safely.
 
@@ -63,9 +63,6 @@ namespace Config {
 #endif
 ```
 Change the dummy ssid and password values for the real ones the code is going to try connecting to in order to synchronize time from UDP server.
-___
-### Changing display contrast
-If the display is to dim to you, change the `displayContrast` variable in `main.cpp`. It takes values from **0** to **255**
 ___
 ### Changing oled driver
 Deafult option for oled display driver is **sh1106**. If you want to use **ssd1306**, head to `mainHeader.h` and uncomment the line `#define USE_SSD1306_OLED`.
@@ -129,14 +126,33 @@ The firmware's functionality is separated in form of screens, each of which prov
         - 2: **stop & reset** the timer
         - 3: **stop** the timer
 
-5. **WiFiTime screen**\
+5. **Settings screen**\
+    Basic settings of the watch.
+    - delay until deepsleep: **45s**
+    - settings:
+        - Alw OD: **on** or **off**, see **Other functionality** for more information
+    - navigation (buttons):
+        - 0: return to **clock screen**
+        - 1: cycle to the **next screen**
+        - 2: cycle the **setting to next**
+        - 3: cycle the **currently changed setting**
+
+6. **WiFiTime screen**\
     Screen used to synchronize time through wifi. To use press `button 3`. The device is going to go **deepsleep**. When you wake it up, it will try to **synchronize the time**. Once it's done, press `button 0` to return to clock screen.
     - delay until deepsleep: **45s**
-***
-***
-## Other information
-This firmware is meant for small (wearable?) devices **running on battery**, so the esp will go into **deepsleep mode** after a set time (usually about 10s) while also **clearing oled display** to save power.\
-*SDA* and *SCL* pins for *I2C* are **not specified** anywhere in the code, so you should use the ones marked on your **board's pinout**.
+___
+### Other functionality
+There is some functionality not associated with specific screen. Here it is explained.
+
+1. **Deepsleep**\
+    This firmware is meant for small (wearable?) devices **running on battery**, so the esp will go into **deepsleep mode** after a set time (usually about 10s) while also **clearing oled display** to save power.
+
+2. **Always On Display (AOD)**\
+    In settings screen, you can turn on the **AOD**. This will make the watch **always display the time**. The board will be in deepsleep, and only wake every minute to update the displayed time.\
+    **Note:** This function **will shorten the use time on battery**.
+
+3. **I2C lines**\
+    *SDA* and *SCL* pins for *I2C* are **not specified** anywhere in the code, so you should use the ones marked on your **board's pinout**.
 
 ***
 ***
