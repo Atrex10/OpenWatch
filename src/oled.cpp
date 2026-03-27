@@ -13,6 +13,13 @@
     Adafruit_SSD1306 display(DISPLAY_WIDTH, DISPLAY_HEIGHT, &Wire, -1);
 #endif
 
+void sh1106_command(uint8_t cmd) {
+    Wire.beginTransmission(DISPLAY_ADDR);
+    Wire.write(0x00); // control byte: command
+    Wire.write(cmd);
+    Wire.endTransmission();
+}
+
 // screen segments start coordinates
 const int segmentsCoords[7][2] = { {0, 0}, {72, 0}, {16, 56}, {80, 56}, {56, 0}, {0, 24}, {72, 24} };
 
@@ -20,6 +27,38 @@ void setDisplayContrast(uint8_t value) {
     // the contrast function only works for sh1106 oled displays
     #ifndef USE_SSD1306_OLED
         display.setContrast(value);
+    #endif
+}
+
+void setDisplayRefresh(uint8_t value) {
+    #ifndef USE_SSD1306_OLED
+        sh1106_command(0xD5);
+
+        uint8_t command = 0x00;
+
+        switch (value)
+        {
+        case 0:
+            command = 0x52;
+            break;
+        case 1:
+            command = 0x51;
+            break;
+        case 2:
+            command = 0x50;
+            break;
+        case 3:
+            command = 0x60;
+            break;
+        case 4:
+            command = 0xF0;
+            break;
+        
+        default:
+            break;
+        }
+
+        sh1106_command(command);
     #endif
 }
 

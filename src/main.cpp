@@ -293,14 +293,16 @@ void appSetup() {
 
   // initiating oled
   #ifndef USE_SSD1306_OLED
-    display.begin(0x3C, true);
+    display.begin(DISPLAY_ADDR, true);
   #else
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   #endif
-  display.clearDisplay();
-  display.display();
   // setting display brightness to predefined value
   setDisplayContrast(displayContrast);
+  setDisplayRefresh(); // set to default
+
+  display.clearDisplay();
+  display.display();
 
   // initiating wake pins
   pinMode(wakePins[0], INPUT_PULLUP);

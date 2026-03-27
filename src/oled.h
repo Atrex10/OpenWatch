@@ -16,12 +16,15 @@
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 64
 
+#define DISPLAY_ADDR 0x3C
+
 
 // screen segments start coordinates
 extern const int segmentsCoords[7][2]; // segments 5 & 6 (index 4 & 5) are not used in usual overlay, only for specific ones
 
 // screen settings
 void setDisplayContrast(uint8_t value);
+void setDisplayRefresh(uint8_t preset = 2); // takes values from 0 (slow) to 4 (fast)
 
 // universal big clock numbers functions
 void displayClockNum(int num, int x=0, int y=0, bool small = false);

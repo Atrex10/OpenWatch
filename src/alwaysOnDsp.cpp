@@ -4,13 +4,16 @@
 
 #include "Arduino.h"
 
-RTC_DATA_ATTR bool AODEnabled = true;
+RTC_DATA_ATTR bool AODEnabled = false;
 
 const int AODClockSegments[4][2][2] = { {{0, 0}, {44, 0}}, 
                                         {{40, 0}, {84, 0}}, 
                                         {{0, 32}, {44, 32}}, 
                                         {{40, 32}, {84, 32}}};
 const int numsSpacing = 4;
+
+const int AODDisplayRefresh = 0;
+const int AODDisplayContrast = 0;
 
 void enableAOD() {
     AODEnabled = true;
@@ -42,6 +45,10 @@ void putOnAOD() {
         numsSpacing, true);
 
     // displayClockNums(dateTime.Second, 10, 10, 6);
+
+    // set display settings
+    setDisplayRefresh(AODDisplayRefresh);
+    setDisplayContrast(AODDisplayContrast);
 
     display.display();
 }
