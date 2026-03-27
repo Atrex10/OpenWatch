@@ -1,6 +1,8 @@
 #ifndef MAINHEADER_H
 #define MAINHEADER_H
 
+#include <Arduino.h>
+
 // HARDWARE CONFIGURATION
 #define USE_EXT_RTC
 #define USE_BATTERY
@@ -18,6 +20,8 @@ extern bool syncTimeFlag;
 
 extern const int thermistorADCPin;
 extern const int thermistorEnablePin;
+
+extern RTC_DATA_ATTR uint8_t displayContrast;
 
 void setUpdateInterval(int interval);
 void setRenderInterval(int interval);

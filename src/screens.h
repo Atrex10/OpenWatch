@@ -729,7 +729,7 @@ class SettingsScreen : public Screen {
         SettingsScreen() {}
 
         // settings values
-        uint8_t numOfSettings = 1;
+        uint8_t numOfSettings = 2;
         uint8_t currentSettingId = 0;
 
         
@@ -757,21 +757,16 @@ class SettingsScreen : public Screen {
             displayText("Settings", segmentsCoords[2][0], segmentsCoords[2][1]);
             
             // drawing settings lines, 16px is for current setting indicator
-            // for next line offset y by 24
-            displayText("Alw On", 16, 0+8);
+            // for next line offset y by 16
+            displayText("Alw OD", 16, 0+8);
+            displayText("Brigh", 16, 16+8);
 
             // drawing settings values
             displayText(AODEnabled ? "On" : "Off", 88, 0+8);
+            displayText(String(displayContrast), 88, 16+8);
 
             // drawing current setting indicator
-            switch (currentSettingId)
-            {
-            case 0:
-                displayText("*", 0, 0+8);
-                break;
-            default:
-                break;
-            }
+            displayText("*", 0, (currentSettingId * 16)+8);
 
             display.display();
         }
@@ -792,6 +787,16 @@ class SettingsScreen : public Screen {
                     enableAOD();
                 }
                 break;
+            case 1:
+                if (displayContrast == 0) { 
+                    displayContrast += 31;
+                } else if (displayContrast == 255) {
+                    displayContrast = 0;
+                } else {
+                    displayContrast += 32;
+                }
+                setDisplayContrast(displayContrast);
+                break;
             
             default:
                 break;
@@ -810,10 +815,13 @@ class SettingsScreen : public Screen {
 
             case 2:
                 cycleSettingModes();
+                return -1;
                 break;
             
             case 3:
                 switchCurSetting();
+                return -1;
+                break;
             
             default: return -1; break; }
         }

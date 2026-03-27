@@ -130,7 +130,8 @@ The firmware's functionality is separated in form of screens, each of which prov
     Basic settings of the watch.
     - delay until deepsleep: **45s**
     - settings:
-        - Alw OD: **on** or **off**, see **Other functionality** for more information
+        - **Alw OD**: on or off, see **Other functionality** for more information
+        - **Brigh**: from 0 to 255, the display's brightness, set with 32 steps
     - navigation (buttons):
         - 0: return to **clock screen**
         - 1: cycle to the **next screen**

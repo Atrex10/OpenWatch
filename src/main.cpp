@@ -43,7 +43,7 @@ const int batteryAdcPin = 1;
 const int thermistorADCPin = 2;
 const int thermistorEnablePin = 16;
 
-const uint8_t displayContrast = 0;
+RTC_DATA_ATTR uint8_t displayContrast = 0;
 
 RTC_DATA_ATTR bool syncTimeFlag = false; // part of not logical, but the only working WiFiTime code
 bool touchWakeFlag = false;
