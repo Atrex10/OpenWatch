@@ -29,7 +29,7 @@ This is a list of hardware the code was tested on:\
         **C1 = 100nF**\
         The capacitor is only needed when using high resistance resistors (add it when the circuit does not work properly).
 
-        `batteryVoltDivFac` deafult value is 2.0.
+        `batteryVoltDivFac` default value is 2.0.
 
         ADC is an analog pin specified by `batteryAdcPin` in `main.cpp`.\
 7. ***Buzzer:**\
@@ -65,7 +65,7 @@ namespace Config {
 Change the dummy ssid and password values for the real ones the code is going to try connecting to in order to synchronize time from UDP server.
 ___
 ### Changing oled driver
-Deafult option for oled display driver is **sh1106**. If you want to use **ssd1306**, head to `mainHeader.h` and uncomment the line `#define USE_SSD1306_OLED`.
+Default option for oled display driver is **sh1106**. If you want to use **ssd1306**, head to `mainHeader.h` and uncomment the line `#define USE_SSD1306_OLED`.
 
 **Note:** The contrast setting **does not work with ssd1306** displays, so changing it won't have any effect.
 ___
@@ -87,12 +87,12 @@ If you don't want to use a buzzer for timer alarm, you can disable it by comment
 The firmware's functionality is separated in form of screens, each of which provides different operation settings, navigation etc. In this point I will break down everything about every screen provided in the firmware.
 
 1. **Time screen**\
-    Deafult screen showing current time and battery level.
+    Default screen showing current time and battery level.
     - delay until deepsleep: **10s**, **6s** if woke up and not further used
     - navigation (buttons):
         - 1: cycle to the **next screen**
-        - 2: jump to **screen with id 2** (date screen by deafult)
-        - 3: jump to **screen with id 3** (timer screen by deafult)
+        - 2: jump to **screen with id 2** (date screen by default)
+        - 3: jump to **screen with id 3** (timer screen by default)
 
 2. **Stopwatch screen**\
     Just a stopwatch.
@@ -100,8 +100,8 @@ The firmware's functionality is separated in form of screens, each of which prov
     - navigation while not running (buttons):
         - 0: return to **clock screen**
         - 1: cycle to the **next screen**
-        - 2: **resets** the stopwatch
-        - 3: **starts** the stopwatch
+        - 2: **reset** the stopwatch
+        - 3: **start** the stopwatch
     - navigation while running (buttons):
         - 2: register **lap time**, press again to release
         - 3: **pause stopwatch**
@@ -159,7 +159,7 @@ There is some functionality not associated with specific screen. Here it is expl
 ***
 ## Build tips
 ### Arduino IDE uploading
-This is the deafult build and upload option, and all the code is set to work with it by deafult. To use it open the `src/` folder in arduino IDE. Here is the list of needed libraries for this project:
+This is the default build and upload option, and all the code is set to work with it by default. To use it open the `src/` folder in arduino IDE. Here is the list of needed libraries for this project:
 - **Adafruit GFX Library@^1.12.4** from **adafruit**
 - **Adafruit SH110X@^2.1.14** or **adafruit/Adafruit SSD1306@^2.5.16** (depending on your oled's driver) from **adafruit**
 - **DS3231@^1.1.2** from **nothernwidget**
@@ -172,4 +172,4 @@ ___
 If you have a board that **PlatformIO** supports, you can try this uploading option as it is **significantly faster**. There is a working `platformio.ini` file included in the repo configured for **esp32 c3** (tested on esp32 c3 super mini). You also have to edit the code a little bit:
 1. Uncomment `// include <Arduino.h>` in `main.cpp`
 2. Rename `appSetup` and `appLoop` functions to `setup` and `loop` correspondingly
-3. It is recommended to delete `src.ini` from `src/` directory to avoid compiling issues (although I didn't exprienced those with this file present)
+3. It is recommended to delete `src.ini` from `src/` directory to avoid compiling issues (although I didn't exprience those with this file present)
